@@ -19,9 +19,6 @@ class Response:
     output_tokens: int
 
 
-client = AsyncAnthropic()
-
-
 async def main() -> Response:
     messages: list[MessageParam] = [
         {
@@ -29,11 +26,13 @@ async def main() -> Response:
             "content": "Hello, Claude!",
         }
     ]
-    message = await client.messages.create(
-        max_tokens=1024,
-        messages=messages,
-        model="claude-opus-4-8",
-    )
+
+    async with AsyncAnthropic() as client:
+        message = await client.messages.create(
+            max_tokens=1024,
+            messages=messages,
+            model="claude-opus-4-8",
+        )
 
     [content] = message.content
     return Response(
