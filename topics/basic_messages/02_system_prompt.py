@@ -3,15 +3,30 @@ Exercise: System Prompt
 Use the system parameter to give Claude a persona or standing instructions.
 """
 
-from anthropic import Anthropic
+import asyncio
+
+from anthropic import AsyncAnthropic
+from anthropic.types import MessageParam, TextBlock
 from dotenv import load_dotenv
 
 load_dotenv()
 
-client = Anthropic()
 
-# TODO: send a message with a system prompt and print the response
+async def main() -> str:
+    messages: list[MessageParam] = [{"role": "user", "content": "Tell me a joke."}]
+
+    async with AsyncAnthropic() as client:
+        message = await client.messages.create(
+            model="claude-haiku-4-5",
+            system="You are a creative storyteller.",
+            max_tokens=512,
+            messages=messages,
+            temperature=1,
+        )
+
+        return block.text if isinstance(block := message.content[0], TextBlock) else ""
 
 
 if __name__ == "__main__":
-    pass
+    res = asyncio.run(main())
+    print(res)
