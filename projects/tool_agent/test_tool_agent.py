@@ -3,21 +3,9 @@
 Fully mocked: no API key, no network. Implement `agent.py` to make these pass.
 """
 
-import importlib.util
-from pathlib import Path
 from unittest.mock import MagicMock
 
-import pytest
-
-
-def _load():
-    path = Path(__file__).parent / "agent.py"
-    if not path.exists():
-        pytest.fail(f"Not implemented yet — create {path.name} (see README.md)")
-    spec = importlib.util.spec_from_file_location("agent", path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+SOLUTION = "agent.py"
 
 
 def _tool_use_message(name, tool_input, tool_id):
@@ -42,34 +30,31 @@ def _text_message(text):
     return msg
 
 
-def test_execute_tool_multiplies():
-    agent = _load()
-    assert agent.execute_tool("multiply", {"a": 6, "b": 7}) == "42"
+def test_execute_tool_multiplies(solution):
+    assert solution.execute_tool("multiply", {"a": 6, "b": 7}) == "42"
 
 
-def test_run_completes_the_tool_loop():
-    agent = _load()
+def test_run_completes_the_tool_loop(solution):
     client = MagicMock()
     client.messages.create.side_effect = [
         _tool_use_message("multiply", {"a": 6, "b": 7}, "toolu_1"),
         _text_message("6 times 7 is 42."),
     ]
 
-    result = agent.run(client, "What is 6 times 7?")
+    result = solution.run(client, "What is 6 times 7?")
 
     assert "42" in result
     assert client.messages.create.call_count == 2
 
 
-def test_run_feeds_tool_result_back_with_matching_id():
-    agent = _load()
+def test_run_feeds_tool_result_back_with_matching_id(solution):
     client = MagicMock()
     client.messages.create.side_effect = [
         _tool_use_message("multiply", {"a": 6, "b": 7}, "toolu_1"),
         _text_message("done"),
     ]
 
-    agent.run(client, "multiply please")
+    solution.run(client, "multiply please")
 
     second_messages = client.messages.create.call_args_list[1].kwargs["messages"]
     tool_results = [
@@ -84,11 +69,10 @@ def test_run_feeds_tool_result_back_with_matching_id():
     assert "42" in str(tool_results[0]["content"])
 
 
-def test_run_passes_tools_to_the_api():
-    agent = _load()
+def test_run_passes_tools_to_the_api(solution):
     client = MagicMock()
     client.messages.create.side_effect = [_text_message("no tools needed")]
 
-    agent.run(client, "hi")
+    solution.run(client, "hi")
 
-    assert client.messages.create.call_args.kwargs["tools"] == agent.TOOLS
+    assert client.messages.create.call_args.kwargs["tools"] == solution.TOOLS

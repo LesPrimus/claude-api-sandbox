@@ -3,21 +3,9 @@
 Fully mocked: no API key, no network. Implement `chatbot.py` to make these pass.
 """
 
-import importlib.util
-from pathlib import Path
 from unittest.mock import MagicMock
 
-import pytest
-
-
-def _load():
-    path = Path(__file__).parent / "chatbot.py"
-    if not path.exists():
-        pytest.fail(f"Not implemented yet — create {path.name} (see README.md)")
-    spec = importlib.util.spec_from_file_location("chatbot", path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+SOLUTION = "chatbot.py"
 
 
 def _text_message(text):
@@ -37,18 +25,16 @@ def _client_returning(*texts):
     return client
 
 
-def test_send_returns_assistant_text():
-    chatbot = _load()
+def test_send_returns_assistant_text(solution):
     client = _client_returning("Hi there!")
-    conv = chatbot.Conversation(client)
+    conv = solution.Conversation(client)
 
     assert conv.send("hello") == "Hi there!"
 
 
-def test_history_records_both_turns():
-    chatbot = _load()
+def test_history_records_both_turns(solution):
     client = _client_returning("Hi there!")
-    conv = chatbot.Conversation(client)
+    conv = solution.Conversation(client)
     conv.send("hello")
 
     assert conv.history == [
@@ -57,10 +43,9 @@ def test_history_records_both_turns():
     ]
 
 
-def test_context_is_resent_on_second_turn():
-    chatbot = _load()
+def test_context_is_resent_on_second_turn(solution):
     client = _client_returning("First reply", "Second reply")
-    conv = chatbot.Conversation(client)
+    conv = solution.Conversation(client)
 
     conv.send("one")
     conv.send("two")
@@ -75,19 +60,17 @@ def test_context_is_resent_on_second_turn():
     ]
 
 
-def test_system_prompt_is_forwarded():
-    chatbot = _load()
+def test_system_prompt_is_forwarded(solution):
     client = _client_returning("ok")
-    conv = chatbot.Conversation(client, system="You are a terse assistant.")
+    conv = solution.Conversation(client, system="You are a terse assistant.")
     conv.send("hello")
 
     assert client.messages.create.call_args.kwargs["system"] == "You are a terse assistant."
 
 
-def test_model_is_forwarded():
-    chatbot = _load()
+def test_model_is_forwarded(solution):
     client = _client_returning("ok")
-    conv = chatbot.Conversation(client, model="claude-haiku-4-5")
+    conv = solution.Conversation(client, model="claude-haiku-4-5")
     conv.send("hello")
 
     assert client.messages.create.call_args.kwargs["model"] == "claude-haiku-4-5"
