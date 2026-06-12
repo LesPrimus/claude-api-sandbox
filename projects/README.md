@@ -38,5 +38,8 @@ a real `Anthropic()` — but the graded functions never construct one themselves
 | 4 | `extractor` | Turn messy text into validated Pydantic objects | structured outputs, `messages.parse()` |
 | 5 | `batch_classifier` | Classify a list of items via the Batches API | batches, polling, result parsing |
 | 6 | `coding_assistant` | A file-editing agent with a human approval gate | adaptive thinking, tool use, safety |
+| 7 | `interactive_chatbot` | Project 1's chatbot, made live: REPL loop, streaming, budget trimming | streaming, token counting, interactive loop |
 
-Suggested order: 1 → 4 → 3 → 2 → 5 → 6 (roughly easiest to hardest).
+Suggested order: 1 → 4 → 3 → 2 → 5 → 6 → 7 (roughly easiest to hardest).
+
+> Project 7 picks up the three stretch goals from Project 1 and grades them.
