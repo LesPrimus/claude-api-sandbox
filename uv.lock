@@ -160,6 +160,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "anthropic", extra = ["aiohttp"] },
+    { name = "pydantic" },
     { name = "python-dotenv" },
 ]
 
@@ -174,6 +175,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "anthropic", extras = ["aiohttp"], specifier = ">=0.107.1" },
+    { name = "pydantic", specifier = ">=2.13.4" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
 ]
 
