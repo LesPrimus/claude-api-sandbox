@@ -5,6 +5,7 @@ description = "Add your description here"
 requires-python = ">=3.14"
 dependencies = [
     "anthropic[aiohttp]>=0.107.1",
+    "openai>=2.41.1",
     "pinecone>=9.1.0",
     "pydantic>=2.13.4",
     "python-dotenv>=1.2.2",
