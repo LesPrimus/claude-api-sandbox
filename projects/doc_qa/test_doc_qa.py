@@ -34,7 +34,10 @@ def test_upload_returns_file_id(solution):
 def test_ask_returns_answer_text(solution):
     client = _client()
 
-    assert solution.ask(client, "file_abc123", "What is the answer?") == "The answer is 42."
+    assert (
+        solution.ask(client, "file_abc123", "What is the answer?")
+        == "The answer is 42."
+    )
 
 
 def test_ask_references_the_file_id_in_a_document_block(solution):
@@ -52,4 +55,6 @@ def test_ask_sets_files_beta_header(solution):
     client = _client()
     solution.ask(client, "file_abc123", "anything")
 
-    assert "files-api-2025-04-14" in client.beta.messages.create.call_args.kwargs["betas"]
+    assert (
+        "files-api-2025-04-14" in client.beta.messages.create.call_args.kwargs["betas"]
+    )

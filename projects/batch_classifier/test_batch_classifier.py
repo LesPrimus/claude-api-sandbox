@@ -34,7 +34,10 @@ def test_parse_results_maps_custom_id_to_label(solution):
         _succeeded_result("item-1", "negative"),
     ]
 
-    assert solution.parse_results(results) == {"item-0": "positive", "item-1": "negative"}
+    assert solution.parse_results(results) == {
+        "item-0": "positive",
+        "item-1": "negative",
+    }
 
 
 def test_classify_creates_polls_and_returns_mapping(solution):

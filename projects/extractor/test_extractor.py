@@ -17,14 +17,18 @@ def _client_returning(contact):
 
 
 def test_contact_model_shape(solution):
-    c = solution.Contact(name="Jane Doe", email="jane@co.com", interests=["API", "SDKs"])
+    c = solution.Contact(
+        name="Jane Doe", email="jane@co.com", interests=["API", "SDKs"]
+    )
     assert c.name == "Jane Doe"
     assert c.email == "jane@co.com"
     assert c.interests == ["API", "SDKs"]
 
 
 def test_extract_returns_parsed_contact(solution):
-    expected = solution.Contact(name="Jane Doe", email="jane@co.com", interests=["API", "SDKs"])
+    expected = solution.Contact(
+        name="Jane Doe", email="jane@co.com", interests=["API", "SDKs"]
+    )
     client = _client_returning(expected)
 
     result = solution.extract(client, SAMPLE)
@@ -40,7 +44,9 @@ def test_extract_uses_parse_with_the_model_as_output_format(solution):
     solution.extract(client, SAMPLE)
 
     assert client.messages.parse.called
-    assert client.messages.parse.call_args.kwargs.get("output_format") is solution.Contact
+    assert (
+        client.messages.parse.call_args.kwargs.get("output_format") is solution.Contact
+    )
 
 
 def test_extract_sends_the_text_to_the_model(solution):

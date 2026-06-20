@@ -65,7 +65,10 @@ def test_system_prompt_is_forwarded(solution):
     conv = solution.Conversation(client, system="You are a terse assistant.")
     conv.send("hello")
 
-    assert client.messages.create.call_args.kwargs["system"] == "You are a terse assistant."
+    assert (
+        client.messages.create.call_args.kwargs["system"]
+        == "You are a terse assistant."
+    )
 
 
 def test_model_is_forwarded(solution):

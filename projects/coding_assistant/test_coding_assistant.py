@@ -53,7 +53,9 @@ def test_write_happens_when_approved(solution, tmp_path):
     client = MagicMock()
     client.messages.create.side_effect = _write_then_done("hello.txt", "hi there")
 
-    result = solution.run(client, "create hello.txt", workdir=tmp_path, approve=lambda n, i: True)
+    result = solution.run(
+        client, "create hello.txt", workdir=tmp_path, approve=lambda n, i: True
+    )
 
     assert (tmp_path / "hello.txt").read_text() == "hi there"
     assert "Done." in result
@@ -63,7 +65,9 @@ def test_write_is_blocked_when_denied(solution, tmp_path):
     client = MagicMock()
     client.messages.create.side_effect = _write_then_done("hello.txt", "hi there")
 
-    result = solution.run(client, "create hello.txt", workdir=tmp_path, approve=lambda n, i: False)
+    result = solution.run(
+        client, "create hello.txt", workdir=tmp_path, approve=lambda n, i: False
+    )
 
     assert not (tmp_path / "hello.txt").exists()
     assert "Done." in result  # loop still completes after the denied write
