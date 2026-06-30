@@ -7,6 +7,7 @@ import sys
 
 from anthropic import AsyncAnthropic
 from anthropic.types import MessageParam
+from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 import httpx
 
@@ -20,14 +21,18 @@ Respond in markdown. Do not wrap the markdown in a code block - respond just wit
 
 
 async def get_content(url: str) -> str:
-    """Fetch the raw text/HTML of a web page."""
+    """Fetch a web page and return its visible text, stripped of markup."""
     async with httpx.AsyncClient(follow_redirects=True) as client:
         response = await client.get(
             url,
             headers={"User-Agent": "Mozilla/5.0 (compatible; claude-summarizer/1.0)"},
         )
         response.raise_for_status()
-        return response.text
+
+    soup = BeautifulSoup(response.text, "html.parser")
+    for tag in soup(["script", "style", "noscript"]):
+        tag.decompose()
+    return soup.get_text(separator="\n", strip=True)
 
 
 async def get_summary(url: str) -> None:
