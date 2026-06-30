@@ -1,12 +1,12 @@
 """
-Exercise: Low-level Streaming
-Use stream=True and iterate over raw SSE events.
+Exercise: Streaming
+Use the messages.stream() helper and iterate over text_stream.
 """
 import asyncio
 import sys
 
 from anthropic import AsyncAnthropic
-from anthropic.types import MessageParam, RawContentBlockDeltaEvent, TextDelta
+from anthropic.types import MessageParam
 from dotenv import load_dotenv
 import httpx
 
@@ -34,8 +34,6 @@ async def get_summary(url: str) -> None:
     """Fetch a page and stream a snarky summary from Claude."""
     content = await get_content(url)
 
-    client = AsyncAnthropic()
-
     messages: list[MessageParam] = [
         {
             "role": "user",
@@ -43,18 +41,16 @@ async def get_summary(url: str) -> None:
         }
     ]
 
-    # stream=True returns an AsyncStream of raw SSE events (no accumulation).
-    stream = await client.messages.create(
+    # messages.stream() is the high-level helper: it accumulates state and
+    # exposes text_stream (text deltas only) plus get_final_message().
+    async with AsyncAnthropic() as client, client.messages.stream(
         model="claude-sonnet-4-6",
         max_tokens=1024,
         system=SYSTEM_PROMPT,
         messages=messages,
-        stream=True,
-    )
-
-    async for event in stream:
-        if isinstance(event, RawContentBlockDeltaEvent) and isinstance(event.delta, TextDelta):
-            print(event.delta.text, end="", flush=True)
+    ) as stream:
+        async for text in stream.text_stream:
+            print(text, end="", flush=True)
     print()
 
 
