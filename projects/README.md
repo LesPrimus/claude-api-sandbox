@@ -39,6 +39,7 @@ a real `Anthropic()` — but the graded functions never construct one themselves
 | 5 | `batch_classifier` | Classify a list of items via the Batches API | batches, polling, result parsing |
 | 6 | `coding_assistant` | A file-editing agent with a human approval gate | adaptive thinking, tool use, safety |
 | 7 | `interactive_chatbot` | Project 1's chatbot, made live: REPL loop, streaming, budget trimming | streaming, token counting, interactive loop |
+| 8 | `brochure_generator` | Scrape a site's links, pick the relevant ones, stream a brochure | async scraping, structured outputs, streaming |
 
 Suggested order: 1 → 4 → 3 → 2 → 5 → 6 → 7 (roughly easiest to hardest).
 
