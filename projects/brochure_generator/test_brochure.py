@@ -6,7 +6,7 @@ The Claude client and the page fetcher are both injected, so every test runs
 offline:
 - `client.messages.parse` is an ``AsyncMock`` (LLM call #1, structured links).
 - `client.messages.stream` returns a fake async context manager (LLM call #2).
-- `fetch_html` is an ``AsyncMock`` returning canned HTML (no real HTTP).
+- `fetcher` is an ``AsyncMock`` returning canned HTML (no real HTTP).
 """
 
 from types import SimpleNamespace
@@ -159,7 +159,7 @@ async def test_make_brochure_fetches_selected_pages_and_assembles(solution):
         "https://acme.com/about": "<h1>About Acme</h1><p>We build things.</p>",
         "https://acme.com/careers": "<h1>Join us</h1>",
     }
-    fetch_html = AsyncMock(side_effect=lambda url, **kw: pages_by_url[url])
+    fetcher = AsyncMock(side_effect=lambda url, **kw: pages_by_url[url])
 
     client = MagicMock()
     relevant = solution.RelevantLinks(
@@ -173,12 +173,10 @@ async def test_make_brochure_fetches_selected_pages_and_assembles(solution):
     )
     client.messages.stream.return_value = _FakeStreamCM(["Brochure ", "text"])
 
-    result = await solution.make_brochure(
-        client, "https://acme.com", fetch_html=fetch_html
-    )
+    result = await solution.make_brochure(client, "https://acme.com", fetcher=fetcher)
 
     assert result == "Brochure text"
-    fetched = {call.args[0] for call in fetch_html.await_args_list}
+    fetched = {call.args[0] for call in fetcher.await_args_list}
     assert "https://acme.com/about" in fetched
     assert "https://acme.com/careers" in fetched
 
@@ -186,7 +184,7 @@ async def test_make_brochure_fetches_selected_pages_and_assembles(solution):
 async def test_make_brochure_skips_pages_that_fail_to_fetch(solution):
     landing = '<html><body><a href="/about">About</a></body></html>'
 
-    async def fetch_html(url, **kw):
+    async def fetcher(url, **kw):
         if url == "https://acme.com":
             return landing
         raise RuntimeError("boom")  # every selected page fails
@@ -201,8 +199,6 @@ async def test_make_brochure_skips_pages_that_fail_to_fetch(solution):
     client.messages.stream.return_value = _FakeStreamCM(["ok"])
 
     # A failed page fetch must not blow up the whole brochure.
-    result = await solution.make_brochure(
-        client, "https://acme.com", fetch_html=fetch_html
-    )
+    result = await solution.make_brochure(client, "https://acme.com", fetcher=fetcher)
 
     assert result == "ok"

@@ -65,7 +65,7 @@ Functions (all take an injected `client`; network lives behind an injectable
   — LLM call #1; returns `response.parsed_output` (empty on refusal).
 - `async build_brochure(client, name, pages, *, model) -> AsyncIterator[str]`
   — LLM call #2; async generator yielding brochure chunks.
-- `async make_brochure(client, url, *, model, fetch_html=fetch_html) -> str`
+- `async make_brochure(client, url, *, model, fetcher=fetch_html) -> str`
   — orchestrates the pipeline, prints as it streams, returns the markdown.
 
 > Unlike the other projects, the solution module is included as a worked

@@ -184,7 +184,7 @@ async def make_brochure(
     url: str,
     *,
     model: str = ModelType.OPUS,
-    fetch_html=fetch_html,
+    fetcher=fetch_html,
 ) -> str:
     """Scrape ``url``, select relevant links, and stream a brochure.
 
@@ -192,12 +192,12 @@ async def make_brochure(
     Page fetches for the selected links run concurrently; a page that fails to
     fetch is skipped rather than aborting the whole brochure.
     """
-    landing_html = await fetch_html(url)
+    landing_html = await fetcher(url)
     links = extract_links(landing_html, url)
     relevant = await select_relevant_links(client, url, links, model=model)
 
     fetched = await asyncio.gather(
-        *(fetch_html(link.url) for link in relevant.links),
+        *(fetcher(link.url) for link in relevant.links),
         return_exceptions=True,
     )
 
